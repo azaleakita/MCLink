@@ -4,14 +4,14 @@
 
 ## 0.5.0 GitHub 发行准备（2026-10-11）
 
-- 新建用户授权的公开仓库 `lin2602298200-del/MCLink`，首个源码提交 `c51cb1b` 已推送至 `main`。依赖、SDK、隔离配置、日志与编译成品不进入源码仓库。
+- 新建用户授权的公开仓库 `azaleakita/MCLink`，首个源码提交 `c51cb1b` 已推送至 `main`。依赖、SDK、隔离配置、日志与编译成品不进入源码仓库。
 - 将锁文件的下载地址改为 npm 官方源，依赖版本与 integrity 不变；干净 `npm ci` 安装 98 个包成功，语法检查及 **72 项测试全部通过**（约 28.2 秒）。发布前因本地依赖缺失导致测试不能完整运行，重新安装后解决。
 - 以独立 `.tools/release-build/MCLink` 目录重新发布自包含 Windows 应用，版本 `0.5.0.0`，不覆盖用户正在使用的目录。
 - 原生设置检查首次展开高级设置时遇到文档已记录的偶发 COM 错误；验证脚本增加有限重试、重新读取控件状态并等待布局后，默认 4/8、修改 6/12、DPAPI 保存和重启恢复检查通过。测试仅操作隔离配置，未调用真实 API。
-- 新增 CI 与标签发行工作流，官方 actionlint 1.7.12 检查通过。首轮 [GitHub Actions](https://github.com/lin2602298200-del/MCLink/actions/runs/38130042740) 的 Ubuntu 与 Windows 桥接测试，以及 Windows 应用/模组构建、打包校验与 artifact 上传**全部通过**。
+- 新增 CI 与标签发行工作流，官方 actionlint 1.7.12 检查通过。首轮 [GitHub Actions](https://github.com/azaleakita/MCLink/actions/runs/38130042740) 的 Ubuntu 与 Windows 桥接测试，以及 Windows 应用/模组构建、打包校验与 artifact 上传**全部通过**。
 - 配套 Java 21 / Fabric 模组完整构建通过，独立 `routingCheck` 通过；普通 JUnit test task 按项目设置跳过。Fabric API 按官方 SHA-256 校验后复制至独立发行目录。
 - 新增 `scripts/package-release.ps1`，验证版本、必要运行时、配套模组与许可文档，过滤 PDB、检查本地配置和凭据，生成完整 `MCLink/` 便携 ZIP 和 SHA-256。本地便携包通过 8,673 个 ZIP 条目检查，包内 Node 运行桥接 hello 命令成功，严格输出 JSON-lines；发行包约 182 MiB。
-- GitHub 发行入口：[v0.5.0](https://github.com/lin2602298200-del/MCLink/releases/tag/v0.5.0)。首版使用上述本地验证产物上传；以后版本通过推送对应标签调用 Release workflow。实际发布日期、资产和下载校验以 Release 页为准。
+- GitHub 发行入口：[v0.5.0](https://github.com/azaleakita/MCLink/releases/tag/v0.5.0)。首版使用上述本地验证产物上传；以后版本通过推送对应标签调用 Release workflow。实际发布日期、资产和下载校验以 Release 页为准。
 
 ## 0.5.0 连续行动与 API 调用频率保护
 

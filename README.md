@@ -4,7 +4,7 @@
 
 ## 启动
 
-发行下载：[GitHub Releases](https://github.com/lin2602298200-del/MCLink/releases)。下载 `MCLink-版本-win-x64.zip`，完整解压后运行 `MCLink/MCLink.App.exe`；同页提供 SHA-256 校验文件。
+发行下载：[GitHub Releases](https://github.com/azaleakita/MCLink/releases)。下载 `MCLink-版本-win-x64.zip`，完整解压后运行 `MCLink/MCLink.App.exe`；同页提供 SHA-256 校验文件。
 
 已编译版本：解压便携包后双击 `MCLink/MCLink.App.exe`。在源码目录中可双击 `dist/MCLink/MCLink.App.exe`，或根目录 `run.cmd`。整个 `MCLink` 文件夹必须一起保留，它包含 .NET、Windows App SDK、Node.js 和桥接依赖。
 
@@ -150,7 +150,7 @@ npm test
 
 ## 发布与云端接手
 
-公开源码仓库：[lin2602298200-del/MCLink](https://github.com/lin2602298200-del/MCLink)。新会话先阅读 [HANDOFF.md](HANDOFF.md)。Node 桥接可在 Linux 和 Windows 上开发与测试，原生界面的构建和运行需要 Windows。
+公开源码仓库：[azaleakita/MCLink](https://github.com/azaleakita/MCLink)。新会话先阅读 [HANDOFF.md](HANDOFF.md)。Node 桥接可在 Linux 和 Windows 上开发与测试，原生界面的构建和运行需要 Windows。
 
 GitHub Actions 在提交与 PR 时运行两种平台的桥接检查，并在 Windows 构建应用和 Fabric 模组。未来发版先同步应用 `csproj`、bridge `package.json` 与锁文件中的版本，添加 `releases/v版本.md`，提交后推送对应 `v版本` 标签；Release workflow 会验证、构建并发布 ZIP 和 SHA-256。Fabric 模组版本独立维护。
 

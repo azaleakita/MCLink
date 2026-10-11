@@ -26,13 +26,14 @@ MCLink 是 Windows 11 x64 的原生 WinUI 3 桌面应用，让普通文本模型
 
 2026-10-11 已创建公开仓库，首个源码提交 `c51cb1b` 已推送至 `main`；旧交接文档中的空仓库状态是历史情况。仓库与发行入口：
 
-- 公开源码仓库：`https://github.com/lin2602298200-del/MCLink`，默认分支 `main`。
-- 已发行：**`v0.5.0`**，公开正式 Release（非草稿、非 prerelease）：`https://github.com/lin2602298200-del/MCLink/releases/tag/v0.5.0`。
+- 公开源码仓库：`https://github.com/azaleakita/MCLink`，默认分支 `main`。
+- 2026-10-11 用户已将 GitHub 账号更名为 **azaleakita**；已核对账号 ID `225581583` 与仓库 ID `1414184844`。源码文档与本地 origin 使用以上新地址。
+- 已发行：**`v0.5.0`**，公开正式 Release（非草稿、非 prerelease）：`https://github.com/azaleakita/MCLink/releases/tag/v0.5.0`。
 - 发行标签对应提交 **`cb7ea51f578d49d9280ff7da4b3bdc6bd477a364`**。首版使用本地验证产物上传；后续版本可推送对应版本标签调用自动 Release workflow。
 - 便携资产：`MCLink-0.5.0-win-x64.zip`，**190,416,497 字节**，8,673 个条目；下载 SHA-256：`adfb2fdf97ebbae99db80dd123bb2ec6c24f1c37934556df40358f9bf77c7f8b`。同页附 91 字节 `.sha256` 校验文件。GitHub 返回的 ZIP digest 已与本地核对一致。
 - GitHub Actions：`.github/workflows/ci.yml` 检查 Ubuntu/Windows 桥接并构建 Windows 程序与模组；`release.yml` 在推送 `v*` 标签后构建并发行，标签必须匹配应用和桥接版本。
 - 发行说明：`releases/v0.5.0.md`；本地打包：`scripts/package-release.ps1`。
-- 首轮云端验证：[Actions run 38130042740](https://github.com/lin2602298200-del/MCLink/actions/runs/38130042740)，Ubuntu/Windows 桥接和 Windows 应用/模组构建、便携打包及上传全部通过。后续文档与桌面 QA 等待逻辑的提交没有修改应用或 bridge 业务实现。
+- 首轮云端验证：[Actions run 38130042740](https://github.com/azaleakita/MCLink/actions/runs/38130042740)，Ubuntu/Windows 桥接和 Windows 应用/模组构建、便携打包及上传全部通过。后续文档与桌面 QA 等待逻辑的提交没有修改应用或 bridge 业务实现。
 
 新会话可直接 clone 上述公开仓库接手，无需传递本地依赖和 SDK 缓存。先检查当前提交、Actions 和 Release，以实际结果为准；不要依据旧空仓库记录恢复或删除当前 Git 历史。
 
