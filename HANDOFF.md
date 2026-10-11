@@ -17,6 +17,7 @@ MCLink 是 Windows 11 x64 的原生 WinUI 3 桌面应用，让普通文本模型
 1. “现在大模型在进行操作的时候，每隔几个步骤都会停止，你优化一下，还有，现在因为高频调用 api，很容易被 deepseek 风控，你看看怎么优化。”
 2. 整理完整 `HANDOFF.md`，使新 Codex 会话可以接手，并准备把本地项目移入云端任务。
 3. 上传当前项目至 GitHub，继续自主维护软件并发布 Release；用户指定仓库公开。
+4. 改善公开仓库简介与 README，并添加真实程序截图。
 
 接手时继续维护现有项目。把开发工作移到云端不代表已经要求重写界面、转换为网站、支持 Linux 桌面或部署一个远程机器人服务。
 
@@ -39,7 +40,11 @@ MCLink 是 Windows 11 x64 的原生 WinUI 3 桌面应用，让普通文本模型
 
 本机最后的 Git HTTPS 增量推送出现连接重置/443 连接失败，改用已授权的 `gh api` 完成同一源码树的上传。GitHub 连接器的更新分支操作曾返回 `Resource not accessible by integration`，本机 GitHub CLI 的授权可正常写入。API 提交已精确导入本地 Git 并同步分支，发布标签对应源码树和本地一致。云端后续写入应使用其自身已配置的 GitHub 授权，不迁移本机 keyring 或令牌。
 
-应携带：`HANDOFF.md`、`README.md`、`VERIFICATION.md`、`.gitignore`、`MCLink.sln`、`bridge/` 的源码/测试/清单/锁文件、`src/MCLink.App/` 的源码与完整 Assets、`scripts/`、`client-mod/` 的源码与构建配置、根目录构建脚本、许可证与素材来源文档。
+2026-10-11 仓库展示更新：README 以“邀请 AI 队友加入你的世界”介绍玩法，增加下载入口、功能介绍与程序截图；截图保存于 `docs/screenshots/`，包括工作台、背包与行动记录、世界地图、模型配置。使用已发行 v0.5.0 程序及其已有的原生 XAML 渲染捕获功能，数据来自隔离的本地 Minecraft 协议演示场景和示例模型响应。截图不代表真实 DeepSeek 服务或完整生存玩法验收。本次只修改展示文档与图片，公开仓库 About 和主题标签同步更新；应用版本、发行标签及现有下载包沿用 0.5.0。
+
+截图验证：四张 PNG 均为 2,048 × 1,368，已检查格式、README 相对图片路径，并使用用户指定的 `vision.js` 检查页面内容、布局与敏感信息。维护此类展示内容时，上传后应核对远端文件 blob 与本地 Git 的哈希；真实游戏/API 验收仍按第 9.5 节执行。
+
+应携带：`HANDOFF.md`、`README.md`、`VERIFICATION.md`、`.gitignore`、`MCLink.sln`、`bridge/` 的源码/测试/清单/锁文件、`src/MCLink.App/` 的源码与完整 Assets、`scripts/`、`client-mod/` 的源码与构建配置、`docs/screenshots/`、根目录构建脚本、许可证与素材来源文档。
 
 可重新生成、不必随源码传递：`node_modules/`、`bin/`、`obj/`、`.tools/` SDK/缓存/下载包、`.gradle/`、`client-mod/build/`、`dist/`。这些目录已由 `.gitignore` 忽略。若需要保存现有 Windows 可执行成品，应另行保留**整个** `dist/MCLink` 文件夹，不要只复制 EXE。
 
