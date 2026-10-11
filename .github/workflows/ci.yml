@@ -1,0 +1,60 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge:
+    name: Bridge (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: bridge/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: bridge
+      - run: npm run check
+        working-directory: bridge
+      - run: npm test
+        working-directory: bridge
+
+  windows:
+    name: Windows portable build
+    needs: bridge
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build application and optional client mod
+        shell: pwsh
+        run: ./build.ps1 -SkipTests -BuildClientMod
+      - name: Package and verify portable archive
+        shell: pwsh
+        run: ./scripts/package-release.ps1 -RequireClientMod
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MCLink-win-x64
+          path: dist/releases/*
+          if-no-files-found: error

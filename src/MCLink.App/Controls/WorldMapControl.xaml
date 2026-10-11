@@ -1,0 +1,14 @@
+<UserControl x:Class="MCLink.App.Controls.WorldMapControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid x:Name="Viewport" Background="#1A312C" SizeChanged="Viewport_SizeChanged">
+    <Grid.Clip><RectangleGeometry x:Name="ViewportClip" /></Grid.Clip>
+    <Viewbox Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid x:Name="MapPlane" Width="512" Height="512" Background="#1A312C" PointerPressed="MapPlane_PointerPressed" PointerMoved="MapPlane_PointerMoved" PointerReleased="MapPlane_PointerReleased" PointerCaptureLost="MapPlane_PointerCaptureLost" PointerWheelChanged="MapPlane_PointerWheelChanged">
+      <Image x:Name="TerrainImage" Stretch="Fill" IsHitTestVisible="False" />
+      <Canvas x:Name="Overlay" IsHitTestVisible="False"><Canvas.Clip><RectangleGeometry Rect="0,0,512,512" /></Canvas.Clip></Canvas>
+    </Grid>
+    </Viewbox>
+    <TextBlock Text="N ↑" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12" FontSize="14" FontWeight="SemiBold" Foreground="#E0EEE5" IsHitTestVisible="False" />
+    <Border x:Name="EmptyMessage" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="16" Margin="12" MaxWidth="340" CornerRadius="12" Background="#CC19352C" IsHitTestVisible="False"><StackPanel Spacing="8"><TextBlock Text="还没有地图数据" Foreground="#E0EEE5" FontSize="18" FontWeight="SemiBold" TextAlignment="Center" TextWrapping="Wrap" /><TextBlock Text="连接世界开始探索，或在地图工具中导入存档。" Foreground="#B8D4C4" FontSize="13" TextWrapping="Wrap" TextAlignment="Center" /></StackPanel></Border>
+    <Border VerticalAlignment="Bottom" HorizontalAlignment="Left" Background="#BB19352C" CornerRadius="6" Padding="10,5" Margin="10" IsHitTestVisible="False"><TextBlock x:Name="ScaleText" Foreground="#D1E5D7" FontSize="12" Text="地表地图" /></Border>
+  </Grid>
+</UserControl>

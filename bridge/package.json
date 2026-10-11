@@ -1,0 +1,24 @@
+{
+  "name": "mclink-bridge",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "Minecraft protocol observations and text-model agent for MCLink",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check src/server.mjs && node --check src/engine.mjs && node --check src/chat.mjs && node --check src/actions.mjs && node --check src/api.mjs && node --check src/request-scheduler.mjs && node --check src/observation.mjs && node --check src/map-cache.mjs && node --check src/map-import-worker.mjs"
+  },
+  "dependencies": {
+    "mineflayer": "4.39.0",
+    "mineflayer-pathfinder": "2.4.5",
+    "prismarine-provider-anvil": "2.13.0",
+    "vec3": "0.2.0"
+  },
+  "devDependencies": {
+    "pngjs": "7.0.0"
+  }
+}

@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Check tag and source versions
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          [xml]$project = Get-Content src/MCLink.App/MCLink.App.csproj -Raw
+          $bridge = Get-Content bridge/package.json -Raw | ConvertFrom-Json
+          if ($version -ne [string]$project.Project.PropertyGroup.Version -or $version -ne $bridge.version) { throw 'Tag must match application and bridge versions.' }
+          if (!(Test-Path "releases/$env:GITHUB_REF_NAME.md")) { throw 'Missing release notes.' }
+      - name: Build and test
+        shell: pwsh
+        run: ./build.ps1 -BuildClientMod
+      - name: Package and verify
+        shell: pwsh
+        run: ./scripts/package-release.ps1 -Version ($env:GITHUB_REF_NAME -replace '^v', '') -RequireClientMod
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MCLink-release
+          path: dist/releases/*
+          if-no-files-found: error
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          gh release create $env:GITHUB_REF_NAME "dist/releases/MCLink-$version-win-x64.zip" "dist/releases/MCLink-$version-win-x64.sha256" --repo $env:GITHUB_REPOSITORY --verify-tag --title "MCLink $env:GITHUB_REF_NAME" --notes-file "releases/$env:GITHUB_REF_NAME.md"
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub Release creation failed.' }

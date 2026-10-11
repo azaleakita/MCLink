@@ -1,0 +1,37 @@
+plugins {
+    id 'fabric-loom' version '1.14.10'
+}
+
+version = project.mod_version
+group = 'dev.mclink'
+base { archivesName = 'mclink-chat-1.21.11' }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.register('routingCheck', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dev.mclink.chat.CommandRouterCheck'
+}
+// Routing checks are a standalone Java entrypoint, rather than JUnit tests.
+tasks.named('test') { enabled = false }
+check.dependsOn routingCheck

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "mclink_chat",
+  "version": "${version}",
+  "name": "MCLink 游戏聊天",
+  "description": "把游戏聊天框中的 /AI指令转发给 MCLink 机器人。",
+  "environment": "client",
+  "entrypoints": { "client": ["dev.mclink.chat.MCLinkChatClient"] },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

@@ -1,0 +1,199 @@
+<Window x:Class="MCLink.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:MCLink.App.Controls" Title="MCLink">
+  <Window.SystemBackdrop><MicaBackdrop /></Window.SystemBackdrop>
+  <Grid x:Name="Root" Loaded="Root_Loaded">
+    <Grid.RowDefinitions><RowDefinition Height="48" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+    <Grid x:Name="TitleBar" Background="Transparent" Padding="20,0,150,0">
+      <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+        <Border Background="{StaticResource MCAccentBrush}" CornerRadius="7" Width="26" Height="26"><Image x:Name="BrandIcon" Width="22" Height="22" /></Border>
+        <TextBlock Text="MCLink" FontWeight="SemiBold" VerticalAlignment="Center" />
+        <TextBlock Text="让语言模型走进你的世界" Style="{StaticResource MutedText}" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
+      </StackPanel>
+    </Grid>
+    <NavigationView x:Name="Navigation" Grid.Row="1" PaneDisplayMode="Left" OpenPaneLength="204" CompactPaneLength="56" IsBackButtonVisible="Collapsed" IsSettingsVisible="False" IsPaneToggleButtonVisible="True" SelectionChanged="Navigation_SelectionChanged" AlwaysShowHeader="False">
+      <NavigationView.MenuItems>
+        <NavigationViewItem Content="工作台" Tag="dashboard" IsSelected="True"><NavigationViewItem.Icon><FontIcon Glyph="&#xE80F;" /></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="世界地图" Tag="map"><NavigationViewItem.Icon><FontIcon Glyph="&#xE707;" /></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="模型与 API" Tag="api"><NavigationViewItem.Icon><FontIcon Glyph="&#xE774;" /></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="游戏连接" Tag="connection"><NavigationViewItem.Icon><FontIcon Glyph="&#xE968;" /></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="运行设置" Tag="settings"><NavigationViewItem.Icon><FontIcon Glyph="&#xE713;" /></NavigationViewItem.Icon></NavigationViewItem>
+      </NavigationView.MenuItems>
+      <NavigationView.FooterMenuItems><NavigationViewItem Content="使用指南" Tag="help"><NavigationViewItem.Icon><FontIcon Glyph="&#xE897;" /></NavigationViewItem.Icon></NavigationViewItem></NavigationView.FooterMenuItems>
+      <Grid Padding="24,12,24,20" RowSpacing="12">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+        <InfoBar x:Name="Notice" IsOpen="False" IsClosable="True" />
+        <Grid Grid.Row="1">
+          <ScrollViewer x:Name="DashboardPanel" VerticalScrollBarVisibility="Auto" ViewChanged="ChatPanel_ViewChanged">
+            <StackPanel Spacing="16">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <StackPanel Spacing="5"><TextBlock Text="你的 AI，正在探索" FontSize="28" FontWeight="SemiBold" /><TextBlock Text="实时游戏数据 → 文字模型决策 → 游戏动作" Style="{StaticResource MutedText}" /></StackPanel>
+                <Button x:Name="ConnectionBadge" Grid.Column="1" Click="ConnectionBadge_Click" VerticalAlignment="Center"><StackPanel Orientation="Horizontal" Spacing="8"><Ellipse x:Name="ConnectionDot" Width="8" Height="8" Fill="{ThemeResource TextFillColorSecondaryBrush}" /><TextBlock x:Name="ConnectionStateText" Text="未连接世界" /></StackPanel></Button>
+              </Grid>
+              <Border Style="{StaticResource CardStyle}">
+                <Grid RowSpacing="12">
+                  <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                  <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="280" /></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock Text="给它一个目标" Style="{StaticResource SectionTitle}" /><TextBlock Text="描述你想完成的任务，模型会逐步观察并行动。" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel><ComboBox x:Name="ActiveProfileCombo" Grid.Column="1" PlaceholderText="先添加模型 API" DisplayMemberPath="Name" HorizontalAlignment="Stretch" SelectionChanged="ActiveProfileCombo_SelectionChanged" AutomationProperties.Name="运行模型" /></Grid>
+                  <TextBox x:Name="GoalBox" Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="76" MaxHeight="150" PlaceholderText="例如：采集原木，制作工作台和木镐，然后寻找煤矿。" AutomationProperties.Name="任务目标" />
+                  <Grid Grid.Row="2"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="StartButton" Content="开始任务" Style="{StaticResource AccentButtonStyle}" Click="StartButton_Click" IsEnabled="False" /><Button x:Name="StopButton" Content="停止" Click="StopButton_Click" IsEnabled="False" /></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="16,0"><ProgressRing x:Name="AgentProgress" Width="18" Height="18" IsActive="False" Visibility="Collapsed" /><TextBlock x:Name="AgentStateText" Text="准备就绪" Style="{StaticResource MutedText}" MaxWidth="350" TextTrimming="CharacterEllipsis" /></StackPanel><TextBlock x:Name="UsageText" Grid.Column="2" Text="0 步 · 0 tokens" Style="{StaticResource MutedText}" FontSize="12" VerticalAlignment="Center" /></Grid>
+                </Grid>
+              </Border>
+              <Border x:Name="ChatDashboardCard" Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="12">
+                  <StackPanel Spacing="4"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="游戏聊天" Style="{StaticResource SectionTitle}" VerticalAlignment="Center" /><HyperlinkButton Grid.Column="1" Content="聊天设置" Click="ChatSettingsButton_Click" /></Grid><TextBlock Text="游戏内普通消息用于聊天，/ 开头的消息用于 AI 指令。原版请用 /msg 机器人名 /指令；安装配套 Fabric 模组后可直接输入 /指令。也可在下方让模型主动发言。" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel>
+                  <TextBox x:Name="ChatTopicBox" Header="发言主题或想说的大意" PlaceholderText="例如：告诉队友我去砍木头，请他先找地方盖房子。" AutomationProperties.Name="发言主题" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" MaxHeight="120" MaxLength="1000" />
+                  <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="GenerateChatButton" Content="让模型发言" Style="{StaticResource AccentButtonStyle}" Click="GenerateChatButton_Click" IsEnabled="False" /><Button x:Name="CancelChatButton" Content="取消发言" Click="CancelChatButton_Click" IsEnabled="False" /></StackPanel>
+                  <TextBlock x:Name="ChatStatusText" Text="连接世界并选择模型后即可在游戏中聊天或下指令，空闲时也会回复。" Style="{StaticResource MutedText}" FontSize="12" />
+                  <TextBlock x:Name="LastChatText" Visibility="Collapsed" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
+                </StackPanel>
+              </Border>
+              <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Border Style="{StaticResource CardStyle}" Padding="16"><StackPanel Spacing="5"><StackPanel Orientation="Horizontal" Spacing="8"><Image x:Name="HealthIcon" Width="20" Height="20" /><TextBlock Text="生命值" Style="{StaticResource MutedText}" VerticalAlignment="Center" FontSize="12" /></StackPanel><TextBlock x:Name="HealthText" Text="— / 20" FontSize="23" FontWeight="SemiBold" /><ProgressBar x:Name="HealthBar" Maximum="20" Value="0" Foreground="#E48282" /></StackPanel></Border>
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="16"><StackPanel Spacing="5"><StackPanel Orientation="Horizontal" Spacing="8"><Image x:Name="FoodIcon" Width="20" Height="20" /><TextBlock Text="饥饿值" Style="{StaticResource MutedText}" VerticalAlignment="Center" FontSize="12" /></StackPanel><TextBlock x:Name="FoodText" Text="— / 20" FontSize="23" FontWeight="SemiBold" /><ProgressBar x:Name="FoodBar" Maximum="20" Value="0" Foreground="#DDB16F" /></StackPanel></Border>
+                <Border Grid.Column="2" Style="{StaticResource CardStyle}" Padding="16"><StackPanel Spacing="5"><StackPanel Orientation="Horizontal" Spacing="8"><Image x:Name="DimensionIcon" Width="20" Height="20" /><TextBlock Text="所在维度" Style="{StaticResource MutedText}" VerticalAlignment="Center" FontSize="12" /></StackPanel><TextBlock x:Name="DimensionText" Text="等待进入" FontSize="21" FontWeight="SemiBold" /><TextBlock x:Name="TimeText" Text="读取世界时间" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel></Border>
+                <Border Grid.Column="3" Style="{StaticResource CardStyle}" Padding="16"><StackPanel Spacing="5"><StackPanel Orientation="Horizontal" Spacing="8"><Image x:Name="PositionIcon" Width="20" Height="20" /><TextBlock Text="当前位置" Style="{StaticResource MutedText}" VerticalAlignment="Center" FontSize="12" /></StackPanel><TextBlock x:Name="PositionText" Text="—, —, —" FontSize="19" FontWeight="SemiBold" /><TextBlock x:Name="HeldItemText" Text="手持：—" Style="{StaticResource MutedText}" FontSize="12" TextTrimming="CharacterEllipsis" /></StackPanel></Border>
+              </Grid>
+              <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="3*" /><ColumnDefinition Width="2*" /></Grid.ColumnDefinitions>
+                <Border Style="{StaticResource CardStyle}" Padding="18">
+                  <StackPanel Spacing="12">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock Text="周围的世界" Style="{StaticResource SectionTitle}" /><TextBlock Text="21 × 21 格局部切片 · 北方在上 · 指向格子查看坐标" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel><Button Grid.Column="1" Click="RefreshButton_Click" ToolTipService.ToolTip="刷新游戏数据" AutomationProperties.Name="刷新游戏数据"><FontIcon Glyph="&#xE72C;" FontSize="16" /></Button></Grid>
+                    <Border Background="#132824" CornerRadius="8" Height="294"><Viewbox Stretch="Uniform"><Canvas x:Name="MapCanvas" Width="294" Height="294" /></Viewbox></Border>
+                    <StackPanel Orientation="Horizontal" Spacing="14"><TextBlock Text="● 草地" Foreground="#6DAD71" FontSize="12" /><TextBlock Text="● 水域" Foreground="#78B7DC" FontSize="12" /><TextBlock Text="● 危险" Foreground="#EFA16A" FontSize="12" /><TextBlock Text="● 机器人" Foreground="#35B89A" FontSize="12" /><TextBlock Text="未知区域为暗格" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel>
+                  </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="18">
+                  <Grid RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Orientation="Horizontal" Spacing="8"><Image x:Name="InventoryHeadingIcon" Width="20" Height="20" /><TextBlock Text="背包" Style="{StaticResource SectionTitle}" VerticalAlignment="Center" /></StackPanel><TextBlock x:Name="InventoryCountText" Grid.Column="1" Text="0 个物品栏" Style="{StaticResource MutedText}" FontSize="12" VerticalAlignment="Center" /></Grid>
+                    <Grid Grid.Row="1" Height="294"><TextBlock x:Name="InventoryEmptyText" Text="连接世界后，这里会显示真实背包。" Style="{StaticResource MutedText}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" /><GridView x:Name="InventoryList" SelectionMode="None" Visibility="Collapsed" IsItemClickEnabled="False"><GridView.ItemTemplate><DataTemplate><Border Width="76" Height="84" CornerRadius="8" Background="{ThemeResource SubtleFillColorSecondaryBrush}" Padding="6" ToolTipService.ToolTip="{Binding DisplayName}" AutomationProperties.Name="{Binding DisplayName}"><Grid><Grid.RowDefinitions><RowDefinition Height="52" /><RowDefinition Height="*" /></Grid.RowDefinitions><Image Source="{Binding Icon}" Width="44" Height="44" /><Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="4" Padding="3,0"><TextBlock Text="{Binding Count}" FontWeight="SemiBold" FontSize="12" /></Border><TextBlock Grid.Row="1" Text="{Binding DisplayName}" FontSize="11" HorizontalAlignment="Center" MaxWidth="64" TextTrimming="CharacterEllipsis" /></Grid></Border></DataTemplate></GridView.ItemTemplate></GridView></Grid>
+                    <Button Grid.Row="2" Content="吃背包里的食物" Click="EatButton_Click" HorizontalAlignment="Stretch" />
+                  </Grid>
+                </Border>
+              </Grid>
+              <Border Style="{StaticResource CardStyle}" Padding="18">
+                <StackPanel Spacing="10"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="行动记录" Style="{StaticResource SectionTitle}" /><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><Button x:Name="OpenLogsButton" Content="打开日志目录" Click="OpenLogs_Click" /><Button Content="清空" Click="ClearLogs_Click" /></StackPanel></Grid><TextBlock x:Name="DecisionText" Text="模型的下一步行动会显示在这里。" Style="{StaticResource MutedText}" /><ListView x:Name="LogsList" Height="230" SelectionMode="None"><ListView.ItemTemplate><DataTemplate><Grid Padding="0,4" ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="60" /><ColumnDefinition Width="64" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions><TextBlock Text="{Binding Time}" FontSize="11" Style="{StaticResource MutedText}" /><TextBlock Grid.Column="1" Text="{Binding Category}" FontSize="12" Foreground="{StaticResource MCAccentBrush}" /><TextBlock Grid.Column="2" Text="{Binding Message}" TextWrapping="Wrap" FontSize="12" IsTextSelectionEnabled="True" /></Grid></DataTemplate></ListView.ItemTemplate></ListView></StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+          <Grid x:Name="WorldMapPanel" Visibility="Collapsed" RowSpacing="14" SizeChanged="WorldMapPanel_SizeChanged">
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+            <Grid ColumnSpacing="12">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+              <StackPanel Spacing="4"><TextBlock x:Name="MapPageTitle" Text="世界地图" FontSize="28" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" /><TextBlock x:Name="MapPositionSummaryText" Text="连接世界或导入存档，查看已生成地形。" Style="{StaticResource MutedText}" FontSize="12" TextTrimming="CharacterEllipsis" MaxLines="2" /></StackPanel>
+              <Button x:Name="MapToolsButton" Grid.Column="1" Content="地图工具" Click="MapToolsButton_Click" Visibility="Collapsed" VerticalAlignment="Center" />
+            </Grid>
+            <Border x:Name="MapToolbarCard" Grid.Row="1" Style="{StaticResource CardStyle}" Padding="14">
+              <Grid x:Name="MapToolbar" ColumnSpacing="12" RowSpacing="10">
+                <Grid.ColumnDefinitions><ColumnDefinition x:Name="MapToolbarFirstColumn" Width="170" /><ColumnDefinition x:Name="MapToolbarSecondColumn" Width="180" /><ColumnDefinition x:Name="MapToolbarThirdColumn" Width="*" /><ColumnDefinition x:Name="MapToolbarFourthColumn" Width="Auto" /></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                <ComboBox x:Name="MapDimensionCombo" Header="维度" AutomationProperties.Name="地图维度" SelectedIndex="0" SelectionChanged="MapDimensionCombo_SelectionChanged" HorizontalAlignment="Stretch" MinWidth="0"><ComboBoxItem Content="主世界" Tag="overworld" /><ComboBoxItem Content="下界" Tag="the_nether" /><ComboBoxItem Content="末地" Tag="the_end" /></ComboBox>
+                <ComboBox x:Name="MapRangeCombo" Grid.Column="1" Header="显示范围" AutomationProperties.Name="显示范围" SelectedIndex="2" SelectionChanged="MapRangeCombo_SelectionChanged" HorizontalAlignment="Stretch" MinWidth="0"><ComboBoxItem Content="64 × 64 格" Tag="64" /><ComboBoxItem Content="128 × 128 格" Tag="128" /><ComboBoxItem Content="256 × 256 格" Tag="256" /><ComboBoxItem Content="512 × 512 格" Tag="512" /></ComboBox>
+                <ToggleSwitch x:Name="FollowMapSwitch" Grid.Column="2" Header="跟随 AI" IsOn="True" OnContent="开启" OffContent="关闭" VerticalAlignment="Bottom" MinWidth="0" Toggled="FollowMapSwitch_Toggled" />
+                <Button x:Name="RefreshWorldMapButton" Grid.Column="3" Content="刷新地图" Click="RefreshWorldMap_Click" VerticalAlignment="Bottom" />
+              </Grid>
+            </Border>
+            <Grid x:Name="MapWorkspace" Grid.Row="2">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="MapInspectorGapColumn" Width="16" /><ColumnDefinition x:Name="MapInspectorColumn" Width="300" /></Grid.ColumnDefinitions>
+              <Border x:Name="MapFrame" Style="{StaticResource CardStyle}" Padding="12" Background="#1A312C">
+                <Grid RowSpacing="8"><Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                  <controls:WorldMapControl x:Name="WorldMapView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                  <TextBlock x:Name="MapHoverText" Grid.Row="1" Text="拖动平移 · 滚轮缩放 · 指向地图查看方块坐标" Foreground="#B8D4C4" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxLines="2" />
+                </Grid>
+              </Border>
+              <ContentControl x:Name="MapInspectorHost" Grid.Column="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <ScrollViewer x:Name="MapInspectorScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <StackPanel Spacing="12" Padding="0,0,3,4">
+                    <Border Style="{StaticResource CardStyle}" Padding="16"><StackPanel Spacing="10">
+                      <TextBlock Text="AI 当前位置" Style="{StaticResource SectionTitle}" />
+                      <TextBlock x:Name="WorldPositionText" Text="等待连接" FontSize="19" FontWeight="SemiBold" TextWrapping="Wrap" />
+                      <TextBlock x:Name="MapStatsText" Text="缓存：0 个区块" Style="{StaticResource MutedText}" />
+                      <TextBlock x:Name="MapPerformanceText" Text="增量读取已生成地形" Style="{StaticResource MutedText}" FontSize="12" />
+                      <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions><NumberBox x:Name="MapCenterXBox" Header="查看 X" Value="0" Minimum="-30000000" Maximum="30000000" MinWidth="0" /><NumberBox x:Name="MapCenterZBox" Grid.Column="1" Header="查看 Z" Value="0" Minimum="-30000000" Maximum="30000000" MinWidth="0" /></Grid>
+                      <Button Content="前往坐标" Click="JumpMap_Click" HorizontalAlignment="Stretch" />
+                    </StackPanel></Border>
+                    <Expander x:Name="MapCacheExpander" Header="地图缓存" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                      <StackPanel Spacing="12"><TextBox x:Name="MapWorldIdBox" Header="世界标识" PlaceholderText="例如：我的生存世界" /><Button x:Name="OpenMapCacheButton" Content="载入此世界缓存" Click="OpenMapCache_Click" HorizontalAlignment="Stretch" /><TextBlock Text="连接与导入时使用相同标识，即可复用地图。留空时按服务器地址区分。" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel>
+                    </Expander>
+                    <Expander x:Name="MapImportExpander" Header="导入存档" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                      <StackPanel Spacing="12"><Button x:Name="ImportWorldButton" Content="选择存档目录…" Click="ImportWorldButton_Click" HorizontalAlignment="Stretch" /><TextBox x:Name="MapImportPathBox" Header="存档或 region 目录" PlaceholderText="选择或粘贴本地路径" /><TextBox x:Name="ImportVersionBox" Header="存档版本（可自动识别）" PlaceholderText="例如 1.21.11" /><NumberBox x:Name="ImportRadiusBox" Header="地图中心的导入半径" Value="256" Minimum="32" Maximum="1024" SpinButtonPlacementMode="Compact" MinWidth="0" /><Button x:Name="StartImportButton" Content="开始导入" Click="StartImportButton_Click" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" /><Button x:Name="StopImportButton" Content="停止导入" Click="StopImportButton_Click" IsEnabled="False" HorizontalAlignment="Stretch" /><TextBlock x:Name="ImportMapStatusText" Text="只读导入已有区块，原存档不会被修改。" Style="{StaticResource MutedText}" FontSize="12" /><TextBlock x:Name="MapSeedText" Style="{StaticResource MutedText}" FontSize="12" IsTextSelectionEnabled="True" /></StackPanel>
+                    </Expander>
+                    <TextBlock Text="地表总览 · 暗格为未知区域&#xA;洞穴细节见工作台局部地图" Style="{StaticResource MutedText}" FontSize="12" Margin="4,0" />
+                  </StackPanel>
+                </ScrollViewer>
+              </ContentControl>
+            </Grid>
+          </Grid>
+          <ScrollViewer x:Name="ApiPanel" Visibility="Collapsed" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" HorizontalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" SizeChanged="ApiPanel_SizeChanged" ViewChanged="ApiPanel_ViewChanged">
+            <Grid x:Name="ApiContent" RowSpacing="18" MaxWidth="1050" HorizontalAlignment="Left">
+              <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+              <StackPanel Spacing="6"><TextBlock Text="模型与 API" FontSize="28" FontWeight="SemiBold" /><TextBlock Text="接入你自己的文本模型。密钥和配置使用当前 Windows 账号加密保存。" Style="{StaticResource MutedText}" /></StackPanel>
+              <Grid x:Name="ApiWorkspace" Grid.Row="1" RowSpacing="18">
+                <Grid.ColumnDefinitions><ColumnDefinition x:Name="ApiProfilesColumn" Width="260" /><ColumnDefinition x:Name="ApiGapColumn" Width="18" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                <Border x:Name="ApiProfilesCard" Style="{StaticResource CardStyle}" Padding="14" VerticalAlignment="Top"><StackPanel Spacing="12"><TextBlock Text="已保存的连接" Style="{StaticResource SectionTitle}" /><ListView x:Name="ProfilesList" SelectionChanged="ProfilesList_SelectionChanged" MinHeight="150" MaxHeight="440"><ListView.ItemTemplate><DataTemplate><StackPanel Padding="0,6" Spacing="3"><TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Subtitle}" Style="{StaticResource MutedText}" FontSize="12" TextTrimming="CharacterEllipsis" /></StackPanel></DataTemplate></ListView.ItemTemplate></ListView><Button x:Name="AddProfileButton" Content="添加 API" Click="AddProfile_Click" HorizontalAlignment="Stretch" /></StackPanel></Border>
+                <Border x:Name="ApiEditorCard" Grid.Column="2" Style="{StaticResource CardStyle}">
+                  <StackPanel Spacing="14">
+                    <Grid x:Name="ApiEditorHeader"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="ApiPresetColumn" Width="Auto" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><TextBlock x:Name="ProfileEditorTitle" Text="添加你的第一个模型" Style="{StaticResource SectionTitle}" TextTrimming="CharacterEllipsis" /><ComboBox x:Name="PresetCombo" Grid.Column="1" PlaceholderText="快速填入" AutomationProperties.Name="快速填入服务配置" SelectionChanged="PresetCombo_SelectionChanged" MinWidth="0"><ComboBoxItem Content="DeepSeek" Tag="deepseek" /><ComboBoxItem Content="OpenAI 兼容" Tag="openai" /><ComboBoxItem Content="Anthropic" Tag="anthropic" /><ComboBoxItem Content="Ollama 本地" Tag="ollama" /></ComboBox></Grid>
+                    <TextBox x:Name="ProfileNameBox" Header="连接名称" PlaceholderText="例如：我的 DeepSeek" />
+                    <ComboBox x:Name="ProtocolCombo" Header="API 协议" HorizontalAlignment="Stretch" MinWidth="0" SelectedIndex="0" SelectionChanged="ModelConnection_Changed"><ComboBoxItem Content="OpenAI 兼容 · /chat/completions" Tag="openai" /><ComboBoxItem Content="Anthropic · /messages" Tag="anthropic" /><ComboBoxItem Content="Ollama · /api/chat" Tag="ollama" /></ComboBox>
+                    <TextBox x:Name="BaseUrlBox" Header="API 基础地址" PlaceholderText="https://api.example.com/v1" TextChanged="ModelConnection_Changed" MinWidth="0" />
+                    <PasswordBox x:Name="ApiKeyBox" Header="API Key" PlaceholderText="本地 Ollama 可以留空" PasswordRevealMode="Peek" PasswordChanged="ModelConnection_Changed" MinWidth="0" />
+                    <Grid x:Name="ApiModelRow" ColumnSpacing="10"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="ApiReadModelsColumn" Width="Auto" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><TextBox x:Name="ModelBox" Header="模型名称 / ID" PlaceholderText="填写服务提供的模型 ID" MinWidth="0" TextChanged="ModelBox_TextChanged" /><Button x:Name="LoadModelsButton" Grid.Column="1" Content="读取模型" Click="LoadModelsButton_Click" VerticalAlignment="Bottom" /></Grid>
+                    <ComboBox x:Name="ModelsCombo" Header="服务提供的模型" Visibility="Collapsed" PlaceholderText="选择接口返回的模型" HorizontalAlignment="Stretch" MinWidth="0" SelectionChanged="ModelsCombo_SelectionChanged" />
+                    <Expander x:Name="ApiAdvancedExpander" Header="高级参数" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"><StackPanel Spacing="12"><TextBox x:Name="HeadersBox" Header="额外请求头（JSON）" Text="{}" AcceptsReturn="True" MinHeight="65" FontFamily="Consolas" TextWrapping="Wrap" TextChanged="ModelConnection_Changed" /><Grid x:Name="ApiAdvancedGrid" ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="ApiTemperatureColumn" Width="*" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><NumberBox x:Name="MaxTokensBox" Header="最大输出 tokens" Value="2048" Minimum="256" Maximum="32768" SpinButtonPlacementMode="Compact" MinWidth="0" /><NumberBox x:Name="TemperatureBox" Grid.Column="1" Header="温度" Value="0.4" Minimum="0" Maximum="2" SmallChange="0.1" SpinButtonPlacementMode="Compact" MinWidth="0" /></Grid><NumberBox x:Name="RequestIntervalBox" Header="API 请求最短间隔（秒，所有任务和聊天共用）" Value="8" Minimum="0" Maximum="120" SmallChange="1" SpinButtonPlacementMode="Compact" MinWidth="0" /><TextBlock Text="遇到限流时自动延长等待。DeepSeek 或代理可设 8–15 秒，本地模型可设 0。" Style="{StaticResource MutedText}" FontSize="12" /><TextBlock Text="完整生成接口地址也可填入。API 地址应包含服务要求的版本路径，例如 /v1。" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel></Expander>
+                    <Grid x:Name="ApiActions" ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition x:Name="ApiSaveColumn" Width="Auto" /><ColumnDefinition x:Name="ApiTestColumn" Width="Auto" /><ColumnDefinition x:Name="ApiDeleteColumn" Width="Auto" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><Button x:Name="SaveProfileButton" Content="保存连接" Style="{StaticResource AccentButtonStyle}" Click="SaveProfile_Click" /><Button x:Name="TestApiButton" Grid.Column="1" Content="测试 API" Click="TestApiButton_Click" /><Button x:Name="DeleteProfileButton" Grid.Column="2" Content="删除" Click="DeleteProfile_Click" IsEnabled="False" /></Grid>
+                    <TextBlock x:Name="ApiResultText" Text="保存后，可在工作台选择这个模型。" Style="{StaticResource MutedText}" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </Grid>
+          </ScrollViewer>
+          <ScrollViewer x:Name="ConnectionPanel" Visibility="Collapsed">
+            <StackPanel Spacing="18" MaxWidth="760" HorizontalAlignment="Left">
+              <StackPanel Spacing="6"><TextBlock Text="连接你的世界" FontSize="28" FontWeight="SemiBold" /><TextBlock Text="支持 Minecraft Java 版。机器人作为一名玩家加入服务器，直接读取协议数据。" Style="{StaticResource MutedText}" /></StackPanel>
+              <Border Style="{StaticResource CardStyle}" MinWidth="620"><StackPanel Spacing="16"><TextBlock Text="Minecraft 服务器" Style="{StaticResource SectionTitle}" /><Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions><TextBox x:Name="HostBox" Header="主机 / IP" Text="localhost" /><NumberBox x:Name="PortBox" Grid.Column="1" Header="端口" Value="25565" Minimum="1" Maximum="65535" /></Grid><ComboBox x:Name="AuthCombo" Header="登录方式" HorizontalAlignment="Stretch" SelectedIndex="0"><ComboBoxItem Content="离线登录 · 局域网或 offline-mode 服务器" Tag="offline" /><ComboBoxItem Content="Microsoft 正版账号 · 浏览器授权" Tag="microsoft" /></ComboBox><TextBox x:Name="UsernameBox" Header="离线玩家名 / Microsoft 账号邮箱" Text="MCLinkBot" /><TextBox x:Name="VersionBox" Header="游戏版本（留空自动检测）" PlaceholderText="例如 1.21.4；需为 Mineflayer 支持的版本" /><StackPanel Orientation="Horizontal" Spacing="10"><Button x:Name="ConnectButton" Content="连接世界" Style="{StaticResource AccentButtonStyle}" Click="ConnectButton_Click" /><Button x:Name="DisconnectButton" Content="断开连接" Click="DisconnectButton_Click" IsEnabled="False" /></StackPanel><TextBlock x:Name="ConnectionDetailText" Text="等待连接" Style="{StaticResource MutedText}" /><InfoBar x:Name="AuthNotice" IsOpen="False" IsClosable="False" Severity="Informational" Title="Microsoft 账号授权"><InfoBar.ActionButton><HyperlinkButton Content="打开微软授权页面" NavigateUri="https://www.microsoft.com/link" /></InfoBar.ActionButton></InfoBar></StackPanel></Border>
+              <Border Style="{StaticResource CardStyle}"><StackPanel Spacing="10"><TextBlock Text="连接本地单人世界" Style="{StaticResource SectionTitle}" /><TextBlock Text="1. 在 Minecraft 中进入世界，按 Esc → 对局域网开放。&#xA;2. 主机填写 localhost，端口填写游戏聊天栏提示的局域网端口。&#xA;3. 离线登录填写与当前玩家不同的名称；需要正版验证时切换 Microsoft。&#xA;4. 保持游戏世界运行，再回到工作台下达任务。" TextWrapping="Wrap" LineHeight="26" /><TextBlock Text="正版服务器需要拥有 Java 版的 Microsoft 账号。机器人与游戏客户端共用同一个账号时，服务器可能踢出其中一方。" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel></Border>
+            </StackPanel>
+          </ScrollViewer>
+          <ScrollViewer x:Name="SettingsPanel" Visibility="Collapsed" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" HorizontalContentAlignment="Stretch" SizeChanged="SettingsPanel_SizeChanged" ViewChanged="ChatPanel_ViewChanged">
+            <StackPanel x:Name="SettingsContent" Spacing="18" MaxWidth="760" HorizontalAlignment="Left">
+              <TextBlock Text="运行设置" FontSize="28" FontWeight="SemiBold" />
+              <Border Style="{StaticResource CardStyle}"><StackPanel Spacing="18">
+                <TextBlock Text="自主探索的边界" Style="{StaticResource SectionTitle}" />
+                <NumberBox x:Name="MaxStepsBox" Header="每次任务最多动作步数" Minimum="1" Maximum="1000" Value="80" SpinButtonPlacementMode="Compact" MinWidth="0" />
+                <NumberBox x:Name="BatchSizeBox" Header="一次模型规划最多几个动作" Minimum="1" Maximum="8" Value="4" SpinButtonPlacementMode="Compact" MinWidth="0" />
+                <NumberBox x:Name="IntervalBox" Header="两批动作之间的间隔（秒）" Minimum="0.5" Maximum="30" Value="2" SmallChange="0.5" SpinButtonPlacementMode="Compact" MinWidth="0" />
+                <TextBlock Text="同一批动作连续执行，每个动作前检查生命和游戏状态；失败或结果不完整时重新规划。API 请求间隔可在模型连接的高级参数中调整。" Style="{StaticResource MutedText}" FontSize="12" />
+                <NumberBox x:Name="StopHealthBox" Header="生命值降至此数时停止任务（0 为关闭低生命停止）" Minimum="0" Maximum="19" Value="4" SpinButtonPlacementMode="Compact" MinWidth="0" />
+                <ToggleSwitch x:Name="AutoEatSwitch" Header="有食物且饥饿时自动进食" IsOn="True" OnContent="开启" OffContent="关闭" />
+                <ComboBox x:Name="ThemeCombo" Header="界面主题" SelectedIndex="0"><ComboBoxItem Content="跟随 Windows" Tag="Default" /><ComboBoxItem Content="浅色" Tag="Light" /><ComboBoxItem Content="深色" Tag="Dark" /></ComboBox>
+                <Button Content="保存设置" Click="SaveSettings_Click" Style="{StaticResource AccentButtonStyle}" />
+                <TextBlock Text="新设置在下次任务开始时生效。停止按钮会取消模型请求，并清除寻路和挖掘动作。" Style="{StaticResource MutedText}" />
+              </StackPanel></Border>
+              <Border x:Name="ChatSettingsCard" Style="{StaticResource CardStyle}"><StackPanel Spacing="16">
+                <StackPanel Spacing="4"><TextBlock Text="聊天与自定义提示词" Style="{StaticResource SectionTitle}" /><TextBlock Text="模型用游戏聊天协议发言。修改风格、称呼、语气或游玩习惯后，点击保存设置。" Style="{StaticResource MutedText}" FontSize="12" /></StackPanel>
+                <ToggleSwitch x:Name="ChatEnabledSwitch" Header="允许模型在游戏内发言" IsOn="True" OnContent="开启" OffContent="关闭" />
+                <ToggleSwitch x:Name="AutoReplyChatSwitch" Header="自动回应玩家聊天（包括空闲时）" IsOn="True" OnContent="开启" OffContent="关闭" />
+                <NumberBox x:Name="ChatIntervalBox" Header="两次发言的最短间隔（秒）" Minimum="3" Maximum="120" Value="8" SpinButtonPlacementMode="Compact" MinWidth="0" />
+                <TextBox x:Name="ChatPromptBox" Header="聊天风格提示词" AutomationProperties.Name="聊天风格提示词" PlaceholderText="例如：用轻松的中文口语，一次一句话，称呼队友为老哥。" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="170" MaxHeight="320" MaxLength="4000" />
+                <TextBlock Text="留空使用默认风格。每份提示词最多 4000 字；实际发言最多 100 字、单行。默认避免重复刷屏，像队友一样简短交流。" Style="{StaticResource MutedText}" FontSize="12" />
+                <Expander x:Name="CustomPromptExpander" Header="游玩补充提示词（可选）" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"><TextBox x:Name="CustomPromptBox" Header="自定义游玩要求" AutomationProperties.Name="游玩补充提示词" PlaceholderText="例如：优先与队友合作；不要拆别人建筑；发现村庄时告诉大家。" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="110" MaxHeight="240" MaxLength="4000" /></Expander>
+                <StackPanel x:Name="ChatSettingsActions" Orientation="Horizontal" Spacing="8"><Button x:Name="SaveChatSettingsButton" Content="保存设置" Click="SaveSettings_Click" Style="{StaticResource AccentButtonStyle}" /><Button x:Name="RestoreChatPromptButton" Content="恢复默认聊天提示词" Click="RestoreChatPromptButton_Click" IsEnabled="False" /></StackPanel>
+                <TextBlock Text="保存后立即更新游戏聊天设置。普通聊天在空闲和任务运行期间均可回复，/ 开头的 AI 指令会启动或替换任务。死亡后自动复活并继续尚未停止的任务；低生命停止阈值仍然有效。" Style="{StaticResource MutedText}" FontSize="12" />
+              </StackPanel></Border>
+              <Border Style="{StaticResource CardStyle}"><StackPanel Spacing="14">
+                <TextBlock Text="物品与界面图标" Style="{StaticResource SectionTitle}" />
+                <TextBlock Text="内置像素 SVG 图标。也可以选择自己的 SVG / PNG 文件夹，按物品注册名命名，例如 apple.svg。子目录 ItemIcons 放物品，UI 放界面图标。" Style="{StaticResource MutedText}" />
+                <TextBlock x:Name="CustomIconPathText" TextWrapping="Wrap" IsTextSelectionEnabled="True" FontSize="12" />
+                <StackPanel Orientation="Horizontal" Spacing="10"><Button Content="导入图标目录…" Click="ImportIconsButton_Click" /><Button Content="恢复内置图标" Click="ResetIconsButton_Click" /></StackPanel>
+                <HyperlinkButton Content="图标来源：CC Leaf / CC Vaults" NavigateUri="https://mcicons.ccleaf.com/" />
+              </StackPanel></Border>
+              <TextBlock x:Name="DataPathText" Style="{StaticResource MutedText}" FontSize="12" IsTextSelectionEnabled="True" />
+            </StackPanel>
+          </ScrollViewer>
+          <ScrollViewer x:Name="HelpPanel" Visibility="Collapsed"><StackPanel Spacing="18" MaxWidth="820" HorizontalAlignment="Left"><TextBlock Text="从一句话开始探索" FontSize="28" FontWeight="SemiBold" /><TextBlock Text="MCLink 把游戏世界翻译成文字，让普通文本模型也能玩 Minecraft。" Style="{StaticResource MutedText}" /><Border Style="{StaticResource CardStyle}"><StackPanel Spacing="14"><TextBlock Text="快速开始" Style="{StaticResource SectionTitle}" /><TextBlock Text="① 在「模型与 API」中添加地址、密钥和模型，测试并保存。&#xA;② 在「游戏连接」中填写服务器，连接后等待进入世界。&#xA;③ 回到「工作台」，选择模型、描述任务，点击开始。" TextWrapping="Wrap" LineHeight="28" /></StackPanel></Border><Border Style="{StaticResource CardStyle}"><StackPanel Spacing="12"><TextBlock Text="它能读到什么？" Style="{StaticResource SectionTitle}" /><TextBlock Text="坐标、生命和饥饿值、背包、附近方块、实体、时间，以及打开后的容器内容。地图由方块数据绘制。模型收到 JSON 文字数据，无需视觉接口、截图或游戏画面。" TextWrapping="Wrap" /><TextBlock Text="机器人只能读取服务器已经发送的区块。工作台地图是附近高度范围的局部切片，在洞穴中显示洞穴层。「世界地图」会缓存已读取区块的地表，并能只读导入本地存档；未读取的区域显示为暗格。" Style="{StaticResource MutedText}" /></StackPanel></Border><Border Style="{StaticResource CardStyle}"><StackPanel Spacing="12"><TextBlock Text="让任务更容易完成" Style="{StaticResource SectionTitle}" /><TextBlock Text="先尝试短目标，例如「采集 4 个原木，制作工作台」。模型通过短批次行动持续推进；长任务受模型能力、服务器限制和区块加载影响。英文注册名（oak_log、wooden_pickaxe）可提高指令精度。" TextWrapping="Wrap" /><TextBlock Text="可执行移动、采集、挖掘、放置、合成、熔炼、容器存取、装备、进食、攻击、跟随和聊天。不同 Minecraft 版本、插件服务器和模组物品的支持以协议库为准。" Style="{StaticResource MutedText}" /></StackPanel></Border><Border Style="{StaticResource CardStyle}"><StackPanel Spacing="12"><TextBlock Text="连接或 API 出错时" Style="{StaticResource SectionTitle}" /><TextBlock Text="连接超时：检查 IP、端口、服务器是否运行及白名单。&#xA;正版授权：在界面给出的微软页面输入授权码，完成登录。&#xA;HTTP 401 / 403：检查密钥和权限；404：检查地址与版本路径。&#xA;HTTP 429：程序会冷却重试；可在 API 高级参数中增加请求间隔。&#xA;动作失败：查看行动记录，缩小目标或换一个位置重试。" TextWrapping="Wrap" LineHeight="26" /></StackPanel></Border></StackPanel></ScrollViewer>
+        </Grid>
+      </Grid>
+    </NavigationView>
+  </Grid>
+</Window>
