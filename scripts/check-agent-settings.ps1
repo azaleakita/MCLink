@@ -49,6 +49,19 @@ function Number-Edit([string]$id) {
 }
 function Number-Value([string]$id) { return (Number-Edit $id).GetCurrentPattern([Windows.Automation.ValuePattern]::Pattern).Current.Value }
 function Set-Text([string]$id, [string]$value) { (Control $id).GetCurrentPattern([Windows.Automation.ValuePattern]::Pattern).SetValue($value) }
+function Expand-ApiAdvanced {
+    for ($attempt = 0; $attempt -lt 10; $attempt++) {
+        try {
+            $pattern = (Control 'ApiAdvancedExpander').GetCurrentPattern([Windows.Automation.ExpandCollapsePattern]::Pattern)
+            if ($pattern.Current.ExpandCollapseState -ne [Windows.Automation.ExpandCollapseState]::Expanded) { $pattern.Expand() }
+            Start-Sleep -Milliseconds 300
+            return
+        } catch {
+            if ($_.Exception.GetBaseException() -isnot [Runtime.InteropServices.COMException] -or $attempt -eq 9) { throw }
+            Start-Sleep -Milliseconds 300
+        }
+    }
+}
 function Read-TestSettings {
     $bytes = [IO.File]::ReadAllBytes((Join-Path $env:MCLINK_DATA_DIR 'settings.bin'))
     $plain = [Security.Cryptography.ProtectedData]::Unprotect($bytes, $null, [Security.Cryptography.DataProtectionScope]::CurrentUser)
@@ -73,7 +86,7 @@ try {
         throw 'Batch setting was not persisted.'
     }
     Page '模型与 API'
-    (Control 'ApiAdvancedExpander').GetCurrentPattern([Windows.Automation.ExpandCollapsePattern]::Pattern).Expand()
+    Expand-ApiAdvanced
     Start-Sleep -Milliseconds 200
     if ((Number-Value 'RequestIntervalBox') -ne '8') { throw 'API interval default is not 8.' }
     Set-Text 'ProfileNameBox' 'QA interval'
@@ -91,7 +104,7 @@ try {
     Page '运行设置'
     if ((Number-Value 'BatchSizeBox') -ne '6') { throw 'Batch setting was not restored.' }
     Page '模型与 API'
-    (Control 'ApiAdvancedExpander').GetCurrentPattern([Windows.Automation.ExpandCollapsePattern]::Pattern).Expand()
+    Expand-ApiAdvanced
     if ((Number-Value 'RequestIntervalBox') -ne '12') { throw 'API interval was not restored.' }
     Write-Output 'PASS: Native WinUI defaults, setting edits, DPAPI persistence and restart restore.'
     Write-Output 'PASS: Isolated data directory; no user API calls or settings changes.'

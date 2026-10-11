@@ -24,12 +24,13 @@ MCLink 是 Windows 11 x64 的原生 WinUI 3 桌面应用，让普通文本模型
 
 ### 2.1 GitHub 上传与发行
 
-2026-10-11 发布前检查时，项目还没有首个 Git 提交；旧交接文档中的空仓库状态是历史情况。此次计划发布：
+2026-10-11 已创建公开仓库，首个源码提交 `c51cb1b` 已推送至 `main`；旧交接文档中的空仓库状态是历史情况。仓库与发行入口：
 
 - 公开源码仓库：`https://github.com/lin2602298200-del/MCLink`，默认分支 `main`。
-- 发行版本：`v0.5.0`，Windows 11 x64 完整便携 ZIP 及 SHA-256 校验文件。
+- 发行版本目标：`v0.5.0`，Windows 11 x64 完整便携 ZIP 及 SHA-256 校验文件；实际发行状态查看 `https://github.com/lin2602298200-del/MCLink/releases/tag/v0.5.0`。
 - GitHub Actions：`.github/workflows/ci.yml` 检查 Ubuntu/Windows 桥接并构建 Windows 程序与模组；`release.yml` 在推送 `v*` 标签后构建并发行，标签必须匹配应用和桥接版本。
 - 发行说明：`releases/v0.5.0.md`；本地打包：`scripts/package-release.ps1`。
+- 首轮云端验证：[Actions run 38130042740](https://github.com/lin2602298200-del/MCLink/actions/runs/38130042740)，Ubuntu/Windows 桥接和 Windows 应用/模组构建、便携打包及上传全部通过。后续文档与桌面 QA 等待逻辑的提交没有修改应用或 bridge 业务实现。
 
 新会话应直接检查上述仓库的提交、Actions 和 Release 状态，以实际结果为准；不要依据旧空仓库记录恢复或删除当前 Git 历史。GitHub 发布成功后，云端可以 clone 仓库接手，无需传递本地依赖和 SDK 缓存。
 
@@ -310,7 +311,7 @@ node C:\Users\lin26\.codex\vision\vision.js "图片路径" "问题"
 | 原生设置验证 | 默认批次 4、API 间隔 8；改为 6、12 后 DPAPI 保存；重启后恢复为 6、12 |
 | 成品同步 | 发布桥接 src 每个文件的 hash 与测试过的源码一致 |
 
-这些测试没有调用用户真实模型 API，也不是完整原版生存世界模拟。没有 Linux 运行结果；不能把 Windows 成功记录写成云端已验证。测试数量随后续合法新增测试可能改变，72 是交接时基线。
+这些测试没有调用用户真实模型 API，也不是完整原版生存世界模拟。2026-10-11 初次 GitHub Actions 的 Ubuntu 与 Windows 桥接检查、Windows 便携构建与打包均通过，补足了原交接时缺少的云端结果。测试数量随后续合法新增测试可能改变，72 是交接时基线。
 
 ## 8. 云端接手与环境准备
 
@@ -488,10 +489,10 @@ Windows 根目录：
 
 | 事项 | 状态与下一步 |
 | --- | --- |
-| GitHub 发布状态 | 本轮已获公开上传与发行授权；以 2.1 节对应仓库和 Actions/Release 实际状态为准 |
+| GitHub 发布状态 | 公开源码已上传，首轮云端检查/构建/打包全部通过；发行实际状态见 2.1 节 Release 链接 |
 | Linux 云端原生界面构建/运行 | 受 Windows 平台约束；桥接可先验证，WinUI/DPAPI/UIA 留到 Windows |
 | 云端干净 npm ci | 已改官方源并完成 Windows 干净安装；云端结果查看 GitHub Actions，受其网络策略影响 |
-| Windows UI Automation 焦点稳定性 | 本轮一次 SetFocus COM 错误，重跑通过；可迁移脚本已验证，仍依赖可用交互桌面与控件焦点时序 |
+| Windows UI Automation 焦点稳定性 | 历史 SetFocus 和本轮展开控件曾出现 COM 错误；增加展开有限重试与布局等待后本轮检查通过，仍依赖可用交互桌面 |
 | 用户真实 DeepSeek/代理风控改善 | 尚未验证；已有日志只证明连接失败后的三次停止，缺少具体状态来源 |
 | 长任务连续运行与真实生存玩法 | 尚未做长时间验收；模型可能只返回单动作，也可能提前认为任务完成 |
 | 通用目标完成证明 | 没有程序化通用 verifier；`done` 依赖模型对新观察判断，保护仅避免把预测的 done 直接接在行动后执行 |
