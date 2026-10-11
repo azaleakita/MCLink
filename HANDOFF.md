@@ -2,7 +2,7 @@
 
 交接整理日期：2026-10-11，Asia/Hong_Kong；0.5.0 功能基线验证日期：2026-10-10。交接基线：桌面应用 **0.5.0.0**、Node 桥接 **0.5.0**、Fabric 客户端模组 **0.4.0**。
 
-当前状态：针对“模型每隔几个步骤停止、频繁 API 调用容易触发 DeepSeek 风控”的优化已实现并验证。2026-10-11 用户进一步授权将项目上传 GitHub、发行 Release，并明确选择**公开仓库，所有人可下载**。已补充自动测试、Windows 构建、版本标签发布和本地便携包校验流程。**尚未部署远程机器人服务，也未进行用户实际 API 的长时间验证。** GitHub 发布结果以本文 2.1 节和实际仓库为准。
+当前状态：针对“模型每隔几个步骤停止、频繁 API 调用容易触发 DeepSeek 风控”的优化已实现并验证。2026-10-11 用户授权公开上传与发行，**源码已上传 GitHub，v0.5.0 Release 已正式公开发布**。已补充自动测试、Windows 构建、版本标签发布和本地便携包校验流程。**尚未部署远程机器人服务，也未进行用户实际 API 的长时间验证。**
 
 本文中的相对路径均以项目根目录为基准。旧本地根目录为 `C:\Users\lin26\OneDrive\文档\ChatGPT\MCLink`；新会话应使用实际工作目录，不要把这个绝对路径写入代码。
 
@@ -27,12 +27,16 @@ MCLink 是 Windows 11 x64 的原生 WinUI 3 桌面应用，让普通文本模型
 2026-10-11 已创建公开仓库，首个源码提交 `c51cb1b` 已推送至 `main`；旧交接文档中的空仓库状态是历史情况。仓库与发行入口：
 
 - 公开源码仓库：`https://github.com/lin2602298200-del/MCLink`，默认分支 `main`。
-- 发行版本目标：`v0.5.0`，Windows 11 x64 完整便携 ZIP 及 SHA-256 校验文件；实际发行状态查看 `https://github.com/lin2602298200-del/MCLink/releases/tag/v0.5.0`。
+- 已发行：**`v0.5.0`**，公开正式 Release（非草稿、非 prerelease）：`https://github.com/lin2602298200-del/MCLink/releases/tag/v0.5.0`。
+- 发行标签对应提交 **`cb7ea51f578d49d9280ff7da4b3bdc6bd477a364`**。首版使用本地验证产物上传；后续版本可推送对应版本标签调用自动 Release workflow。
+- 便携资产：`MCLink-0.5.0-win-x64.zip`，**190,416,497 字节**，8,673 个条目；下载 SHA-256：`adfb2fdf97ebbae99db80dd123bb2ec6c24f1c37934556df40358f9bf77c7f8b`。同页附 91 字节 `.sha256` 校验文件。GitHub 返回的 ZIP digest 已与本地核对一致。
 - GitHub Actions：`.github/workflows/ci.yml` 检查 Ubuntu/Windows 桥接并构建 Windows 程序与模组；`release.yml` 在推送 `v*` 标签后构建并发行，标签必须匹配应用和桥接版本。
 - 发行说明：`releases/v0.5.0.md`；本地打包：`scripts/package-release.ps1`。
 - 首轮云端验证：[Actions run 38130042740](https://github.com/lin2602298200-del/MCLink/actions/runs/38130042740)，Ubuntu/Windows 桥接和 Windows 应用/模组构建、便携打包及上传全部通过。后续文档与桌面 QA 等待逻辑的提交没有修改应用或 bridge 业务实现。
 
-新会话应直接检查上述仓库的提交、Actions 和 Release 状态，以实际结果为准；不要依据旧空仓库记录恢复或删除当前 Git 历史。GitHub 发布成功后，云端可以 clone 仓库接手，无需传递本地依赖和 SDK 缓存。
+新会话可直接 clone 上述公开仓库接手，无需传递本地依赖和 SDK 缓存。先检查当前提交、Actions 和 Release，以实际结果为准；不要依据旧空仓库记录恢复或删除当前 Git 历史。
+
+本机最后的 Git HTTPS 增量推送出现连接重置/443 连接失败，改用已授权的 `gh api` 完成同一源码树的上传。GitHub 连接器的更新分支操作曾返回 `Resource not accessible by integration`，本机 GitHub CLI 的授权可正常写入。API 提交已精确导入本地 Git 并同步分支，发布标签对应源码树和本地一致。云端后续写入应使用其自身已配置的 GitHub 授权，不迁移本机 keyring 或令牌。
 
 应携带：`HANDOFF.md`、`README.md`、`VERIFICATION.md`、`.gitignore`、`MCLink.sln`、`bridge/` 的源码/测试/清单/锁文件、`src/MCLink.App/` 的源码与完整 Assets、`scripts/`、`client-mod/` 的源码与构建配置、根目录构建脚本、许可证与素材来源文档。
 
@@ -268,7 +272,7 @@ node C:\Users\lin26\.codex\vision\vision.js "图片路径" "问题"
 
 ## 6. 本次修改文件清单
 
-这里列出最近“持续行动/API 调度”任务及本轮交接的改动，不表示项目历史所有文件都由本次创建。因为当前没有 Git 基线，无法用 commit diff 恢复改动前版本。
+这里列出最近“持续行动/API 调度”任务及交接的改动，不表示项目历史所有文件都由本次创建。项目现已纳入 Git，但没有优化前的历史提交，无法用 commit diff 恢复更早版本。
 
 | 文件 | 改动 |
 | --- | --- |
@@ -294,6 +298,8 @@ node C:\Users\lin26\.codex\vision\vision.js "图片路径" "问题"
 | `scripts/check-agent-settings.ps1` | 本轮保留可迁移版本，数据仍写在 .tools 的独立目录 |
 | `HANDOFF.md` | 本轮交接文档 |
 | `dist/MCLink/` | 发布更新后的 EXE/程序集、桥接 src/package.json 和 README/VERIFICATION；Git 忽略 |
+
+2026-10-11 GitHub 发行补充：`.github/workflows/ci.yml`、`release.yml`、`.gitattributes`、`releases/v0.5.0.md`、`scripts/package-release.ps1`；构建脚本新增独立输出目录参数，桌面 QA 新增 AppDirectory 和展开控件有限重试。`.gitignore` 排除本地密钥/设置；锁文件仅规范下载源，未改版本/integrity。最终本地发行文件位于 `dist/releases-v0.5.0/`，完整构建目录为 `.tools/release-build/MCLink/`，均不进源码 Git。
 
 本次没有改动游戏客户端模组、地图缓存实现、观察算法、原有图标资产、DPAPI 加密实现或真实用户配置。`server.mjs` 通过其调用的 `complete()` / `listModels()` 自动获得调度保护，本次没有改它的 IPC 路由。
 
@@ -337,7 +343,7 @@ npm --version
 
 然后读取 `HANDOFF.md`、`README.md`、`VERIFICATION.md` 最新部分、实际存在的 `AGENTS.md`，以及 `bridge/package.json`。确认完整 Assets、测试和锁文件在云端，不要只得到一段代码或旧成品。
 
-若已经完成首个提交，上述 Git 状态应与本文的“未提交基线”不同，以实际状态为准；不要反向恢复成空仓库。
+当前已经完成入库与发行，上述 Git 状态应显示已跟踪源码和提交历史；不要反向恢复成空仓库。
 
 ### 8.3 Linux / 通用 Node 初始化
 
@@ -489,7 +495,8 @@ Windows 根目录：
 
 | 事项 | 状态与下一步 |
 | --- | --- |
-| GitHub 发布状态 | 公开源码已上传，首轮云端检查/构建/打包全部通过；发行实际状态见 2.1 节 Release 链接 |
+| GitHub 发布状态 | 公开源码与正式 v0.5.0 Release 均已上传，首轮云端检查/构建/打包全部通过；下载 digest 已核对 |
+| 本机 Git 网络与连接器写权限 | Git HTTPS 增量推送失败、连接器 ref 更新被拒；已通过 CLI/API 完成发布与本地同步。云端需检查自己的写入授权和网络 |
 | Linux 云端原生界面构建/运行 | 受 Windows 平台约束；桥接可先验证，WinUI/DPAPI/UIA 留到 Windows |
 | 云端干净 npm ci | 已改官方源并完成 Windows 干净安装；云端结果查看 GitHub Actions，受其网络策略影响 |
 | Windows UI Automation 焦点稳定性 | 历史 SetFocus 和本轮展开控件曾出现 COM 错误；增加展开有限重试与布局等待后本轮检查通过，仍依赖可用交互桌面 |
@@ -508,7 +515,7 @@ Windows 根目录：
 
 ## 11. 建议的下一步执行顺序
 
-1. 完成源码传递，核对 Git 已跟踪内容、版本与完整文件结构。新会话读完本文后先报告实际环境和缺失项。
+1. 在云端 clone 公开仓库，核对 Git 已跟踪内容、版本、完整文件结构及自身 GitHub 写入授权。新会话读完本文后先报告实际环境和缺失项。
 2. 在云端 Node 22+ 环境完成干净依赖安装、`npm run check`、`npm test`，记录真实云端结果；如 socket 或网络受限，明确是哪一阶段受阻。
 3. 保留已通过的 0.5.0 实现作为基线。若没有新修改需求，可以完成交接/验证，不必重新设计项目。
 4. 在可访问真实服务和游戏的环境收集持续行动与调用频率数据；确定剩余停顿来自队列冷却、模型生成、动作寻路、错误恢复还是模型提前 done。
